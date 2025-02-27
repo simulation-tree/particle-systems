@@ -39,11 +39,11 @@ namespace Particles.Systems
                 states.Length = capacity;
             }
 
-            ComponentType emitterType = world.Schema.GetComponent<IsParticleEmitter>();
-            ArrayElementType arrayType = world.Schema.GetArrayElement<Particle>();
+            ComponentType emitterType = world.Schema.GetComponentType<IsParticleEmitter>();
+            ArrayElementType arrayType = world.Schema.GetArrayType<Particle>();
             foreach (Chunk chunk in world.Chunks)
             {
-                if (chunk.Definition.Contains(emitterType))
+                if (chunk.Definition.ContainsComponent(emitterType))
                 {
                     USpan<uint> entities = chunk.Entities;
                     USpan<IsParticleEmitter> components = chunk.GetComponents<IsParticleEmitter>(emitterType);
