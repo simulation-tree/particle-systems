@@ -51,7 +51,7 @@ namespace Particles.Systems
                     {
                         ParticleEmitter entity = new Entity(world, entities[i]).As<ParticleEmitter>();
                         IsParticleEmitter emitter = components[i];
-                        Array<Particle> particles = world.GetArray<Particle>(entities[i], arrayType);
+                        Values<Particle> particles = world.GetArray<Particle>(entities[i], arrayType);
                         ref ParticleEmitterState state = ref states[i];
                         if (state.Entity != entity.value)
                         {
@@ -77,7 +77,7 @@ namespace Particles.Systems
             }
         }
 
-        private static void Update(ParticleEmitter entity, IsParticleEmitter emitter, Array<Particle> particles, ArrayElementType arrayType, float delta, ref ParticleEmitterState state)
+        private static void Update(ParticleEmitter entity, IsParticleEmitter emitter, Values<Particle> particles, ArrayElementType arrayType, float delta, ref ParticleEmitterState state)
         {
             //advance current particles
             for (uint i = 0; i < particles.Length; i++)
