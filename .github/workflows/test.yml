@@ -28,6 +28,13 @@ jobs:
         with:
           path: ${{ github.event.repository.name }}
             
+      - name: Checkout `simulation`
+        uses: actions/checkout@v4.1.2
+        with:
+          repository: game-simulations/simulation
+          token: ${{ secrets.PAT }}
+          path: simulation
+      
       - name: Checkout `worlds`
         uses: actions/checkout@v4.1.2
         with:
@@ -42,12 +49,12 @@ jobs:
           token: ${{ secrets.PAT }}
           path: types
       
-      - name: Checkout `simulation`
+      - name: Checkout `particles`
         uses: actions/checkout@v4.1.2
         with:
-          repository: game-simulations/simulation
+          repository: game-simulations/particles
           token: ${{ secrets.PAT }}
-          path: simulation
+          path: particles
       
       - name: Checkout `unmanaged`
         uses: actions/checkout@v4.1.2
@@ -55,6 +62,13 @@ jobs:
           repository: game-simulations/unmanaged
           token: ${{ secrets.PAT }}
           path: unmanaged
+      
+      - name: Checkout `shapes`
+        uses: actions/checkout@v4.1.2
+        with:
+          repository: game-simulations/shapes
+          token: ${{ secrets.PAT }}
+          path: shapes
       
       - name: Checkout `collections`
         uses: actions/checkout@v4.1.2

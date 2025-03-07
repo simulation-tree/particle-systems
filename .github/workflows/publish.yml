@@ -15,6 +15,13 @@ jobs:
         with:
           path: ${{ github.event.repository.name }}
             
+      - name: Checkout `simulation`
+        uses: actions/checkout@v4.1.2
+        with:
+          repository: game-simulations/simulation
+          token: ${{ secrets.PAT }}
+          path: simulation
+      
       - name: Checkout `worlds`
         uses: actions/checkout@v4.1.2
         with:
@@ -29,12 +36,12 @@ jobs:
           token: ${{ secrets.PAT }}
           path: types
       
-      - name: Checkout `simulation`
+      - name: Checkout `particles`
         uses: actions/checkout@v4.1.2
         with:
-          repository: game-simulations/simulation
+          repository: game-simulations/particles
           token: ${{ secrets.PAT }}
-          path: simulation
+          path: particles
       
       - name: Checkout `unmanaged`
         uses: actions/checkout@v4.1.2
@@ -42,6 +49,13 @@ jobs:
           repository: game-simulations/unmanaged
           token: ${{ secrets.PAT }}
           path: unmanaged
+      
+      - name: Checkout `shapes`
+        uses: actions/checkout@v4.1.2
+        with:
+          repository: game-simulations/shapes
+          token: ${{ secrets.PAT }}
+          path: shapes
       
       - name: Checkout `collections`
         uses: actions/checkout@v4.1.2
@@ -58,22 +72,22 @@ jobs:
       - name: Set VERSION variable from tag
         run: echo "VERSION=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
             
-      - name: Build `Particle.Systems`
+      - name: Build `Particles.Systems`
         run: dotnet build "${{ github.event.repository.name }}/source" -c Release /p:Version=${VERSION}
       
-      - name: Build `Particle.Systems.Tests`
+      - name: Build `Particles.Systems.Tests`
         run: dotnet build "${{ github.event.repository.name }}/tests" -c Release /p:Version=${VERSION}
             
       - name: Test
         run: dotnet test "${{ github.event.repository.name }}/tests" -c Release --logger "trx"
             
-      - name: Pack `Particle.Systems`
+      - name: Pack `Particles.Systems`
         run: dotnet pack "${{ github.event.repository.name }}/source" -c Release /p:Version=${VERSION} --no-build --output .
 
       - name: Add NuGet Source
         run: dotnet nuget add source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --name github --username ${{ github.repository_owner }} --password ${{ github.token }} --store-password-in-clear-text
             
-      - name: Publish `Particle.Systems`
-        run: dotnet nuget push Particle.Systems.${VERSION}.nupkg --source github --api-key ${NUGET_TOKEN}
+      - name: Publish `Particles.Systems`
+        run: dotnet nuget push Particles.Systems.${VERSION}.nupkg --source github --api-key ${NUGET_TOKEN}
         env:
           NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
