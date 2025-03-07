@@ -27,7 +27,7 @@ namespace Particles.Systems
         readonly void ISystem.Update(in SystemContainer systemContainer, in World world, in TimeSpan delta)
         {
             float deltaSeconds = (float)delta.TotalSeconds;
-            uint capacity = Allocations.GetNextPowerOf2(world.MaxEntityValue + 1);
+            uint capacity = (world.MaxEntityValue + 1).GetNextPowerOf2();
             ref Array<ParticleEmitterState> states = ref statesPerWorld.TryGetValue(world, out bool contains);
             if (!contains)
             {
