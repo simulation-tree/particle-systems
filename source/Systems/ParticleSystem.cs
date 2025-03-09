@@ -27,7 +27,7 @@ namespace Particles.Systems
         readonly void ISystem.Update(in SystemContainer systemContainer, in World world, in TimeSpan delta)
         {
             float deltaSeconds = (float)delta.TotalSeconds;
-            uint capacity = (world.MaxEntityValue + 1).GetNextPowerOf2();
+            int capacity = (world.MaxEntityValue + 1).GetNextPowerOf2();
             ref Array<ParticleEmitterState> states = ref statesPerWorld.TryGetValue(world, out bool contains);
             if (!contains)
             {
@@ -45,9 +45,9 @@ namespace Particles.Systems
             {
                 if (chunk.Definition.ContainsComponent(emitterType))
                 {
-                    USpan<uint> entities = chunk.Entities;
-                    USpan<IsParticleEmitter> components = chunk.GetComponents<IsParticleEmitter>(emitterType);
-                    for (uint i = 0; i < entities.Length; i++)
+                    ReadOnlySpan<uint> entities = chunk.Entities;
+                    Span<IsParticleEmitter> components = chunk.GetComponents<IsParticleEmitter>(emitterType);
+                    for (int i = 0; i < entities.Length; i++)
                     {
                         ParticleEmitter entity = new Entity(world, entities[i]).As<ParticleEmitter>();
                         IsParticleEmitter emitter = components[i];
@@ -80,7 +80,7 @@ namespace Particles.Systems
         private static void Update(ParticleEmitter entity, IsParticleEmitter emitter, Values<Particle> particles, ArrayElementType arrayType, float delta, ref ParticleEmitterState state)
         {
             //advance current particles
-            for (uint i = 0; i < particles.Length; i++)
+            for (int i = 0; i < particles.Length; i++)
             {
                 ref Particle particle = ref particles[i];
                 particle.lifetime -= delta;
@@ -91,7 +91,7 @@ namespace Particles.Systems
             }
 
             //create new particles
-            uint particlesToSpawn = 0;
+            int particlesToSpawn = 0;
             while (true)
             {
                 if (state.spawnCooldown <= 0)
@@ -109,7 +109,7 @@ namespace Particles.Systems
             if (particlesToSpawn > 0)
             {
                 //reuse free particles
-                for (uint f = 0; f < particles.Length; f++)
+                for (int f = 0; f < particles.Length; f++)
                 {
                     ref Particle particle = ref particles[f];
                     if (particle.free)
@@ -125,10 +125,10 @@ namespace Particles.Systems
 
                 if (particlesToSpawn > 0)
                 {
-                    uint previousLength = particles.Length;
+                    int previousLength = particles.Length;
                     particles.Length += particlesToSpawn;
-                    uint newLength = particles.Length;
-                    for (uint p = previousLength; p < newLength; p++)
+                    int newLength = particles.Length;
+                    for (int p = previousLength; p < newLength; p++)
                     {
                         Spawn(ref particles[p], emitter, ref state);
                     }
