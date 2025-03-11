@@ -40,7 +40,7 @@ namespace Particles.Systems
             }
 
             ComponentType emitterType = world.Schema.GetComponentType<IsParticleEmitter>();
-            ArrayElementType arrayType = world.Schema.GetArrayType<Particle>();
+            ArrayType arrayType = world.Schema.GetArrayType<Particle>();
             foreach (Chunk chunk in world.Chunks)
             {
                 if (chunk.Definition.ContainsComponent(emitterType))
@@ -77,7 +77,7 @@ namespace Particles.Systems
             }
         }
 
-        private static void Update(ParticleEmitter entity, IsParticleEmitter emitter, Values<Particle> particles, ArrayElementType arrayType, float delta, ref ParticleEmitterState state)
+        private static void Update(ParticleEmitter entity, IsParticleEmitter emitter, Values<Particle> particles, ArrayType arrayType, float delta, ref ParticleEmitterState state)
         {
             //advance current particles
             for (int i = 0; i < particles.Length; i++)
