@@ -11,20 +11,26 @@ namespace Particles.Systems
     {
         private readonly Dictionary<World, Array<ParticleEmitterState>> statesPerWorld;
 
-        private ParticleSystem(World world)
+        public ParticleSystem()
         {
-            statesPerWorld = new();
+            statesPerWorld = new(4);
         }
 
-        readonly void ISystem.Start(in SystemContainer systemContainer, in World world)
+        public readonly void Dispose()
         {
-            if (systemContainer.World == world)
+            foreach (Array<ParticleEmitterState> states in statesPerWorld.Values)
             {
-                systemContainer.Write(new ParticleSystem(world));
+                states.Dispose();
             }
+
+            statesPerWorld.Dispose();
         }
 
-        readonly void ISystem.Update(in SystemContainer systemContainer, in World world, in TimeSpan delta)
+        readonly void ISystem.Start(in SystemContext context, in World world)
+        {
+        }
+
+        readonly void ISystem.Update(in SystemContext context, in World world, in TimeSpan delta)
         {
             float deltaSeconds = (float)delta.TotalSeconds;
             int capacity = (world.MaxEntityValue + 1).GetNextPowerOf2();
@@ -39,14 +45,14 @@ namespace Particles.Systems
                 states.Length = capacity;
             }
 
-            ComponentType emitterType = world.Schema.GetComponentType<IsParticleEmitter>();
-            ArrayType arrayType = world.Schema.GetArrayType<Particle>();
+            int emitterType = world.Schema.GetComponentType<IsParticleEmitter>();
+            int arrayType = world.Schema.GetArrayType<Particle>();
             foreach (Chunk chunk in world.Chunks)
             {
                 if (chunk.Definition.ContainsComponent(emitterType))
                 {
                     ReadOnlySpan<uint> entities = chunk.Entities;
-                    Span<IsParticleEmitter> components = chunk.GetComponents<IsParticleEmitter>(emitterType);
+                    ComponentEnumerator<IsParticleEmitter> components = chunk.GetComponents<IsParticleEmitter>(emitterType);
                     for (int i = 0; i < entities.Length; i++)
                     {
                         ParticleEmitter entity = new Entity(world, entities[i]).As<ParticleEmitter>();
@@ -64,20 +70,11 @@ namespace Particles.Systems
             }
         }
 
-        readonly void ISystem.Finish(in SystemContainer systemContainer, in World world)
+        readonly void ISystem.Finish(in SystemContext context, in World world)
         {
-            if (systemContainer.World == world)
-            {
-                foreach (Array<ParticleEmitterState> states in statesPerWorld.Values)
-                {
-                    states.Dispose();
-                }
-
-                statesPerWorld.Dispose();
-            }
         }
 
-        private static void Update(ParticleEmitter entity, IsParticleEmitter emitter, Values<Particle> particles, ArrayType arrayType, float delta, ref ParticleEmitterState state)
+        private static void Update(ParticleEmitter entity, IsParticleEmitter emitter, Values<Particle> particles, int arrayType, float delta, ref ParticleEmitterState state)
         {
             //advance current particles
             for (int i = 0; i < particles.Length; i++)

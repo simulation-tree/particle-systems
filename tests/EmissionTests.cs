@@ -10,7 +10,7 @@ namespace Particles.Systems.Tests
         [Test]
         public void EmitParticlesOverTime()
         {
-            simulator.AddSystem<ParticleSystem>();
+            simulator.AddSystem(new ParticleSystem());
 
             ParticleEmitter emitter = new(world);
             emitter.Emission.interval = new(0.2f);
