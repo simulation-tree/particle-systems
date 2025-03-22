@@ -8,8 +8,8 @@ namespace Particles.Systems.Tests
     {
         static ParticleSystemTests()
         {
-            TypeRegistry.Load<ParticlesTypeBank>();
-            TypeRegistry.Load<ParticlesSystemsTypeBank>();
+            MetadataRegistry.Load<ParticlesTypeBank>();
+            MetadataRegistry.Load<ParticlesSystemsTypeBank>();
         }
 
         protected override Schema CreateSchema()
