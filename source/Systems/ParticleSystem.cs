@@ -123,7 +123,7 @@ namespace Particles.Systems
                 if (particlesToSpawn > 0)
                 {
                     int previousLength = particles.Length;
-                    particles.Length += particlesToSpawn;
+                    particles.Resize(previousLength + particlesToSpawn);
                     int newLength = particles.Length;
                     for (int p = previousLength; p < newLength; p++)
                     {
