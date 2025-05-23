@@ -15,12 +15,12 @@ namespace Particles.Systems.Tests
         protected override void SetUp()
         {
             base.SetUp();
-            simulator.Add(new ParticleSystem());
+            Simulator.Add(new ParticleSystem());
         }
 
         protected override void TearDown()
         {
-            simulator.Remove<ParticleSystem>();
+            Simulator.Remove<ParticleSystem>();
             base.TearDown();
         }
 
