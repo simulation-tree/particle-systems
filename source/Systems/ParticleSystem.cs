@@ -7,7 +7,7 @@ using Worlds;
 
 namespace Particles.Systems
 {
-    public partial struct ParticleSystem : ISystem
+    public class ParticleSystem : ISystem, IDisposable
     {
         private readonly Dictionary<World, Array<ParticleEmitterState>> statesPerWorld;
 
@@ -16,7 +16,7 @@ namespace Particles.Systems
             statesPerWorld = new(4);
         }
 
-        public readonly void Dispose()
+        public void Dispose()
         {
             foreach (Array<ParticleEmitterState> states in statesPerWorld.Values)
             {
@@ -26,13 +26,9 @@ namespace Particles.Systems
             statesPerWorld.Dispose();
         }
 
-        readonly void ISystem.Start(in SystemContext context, in World world)
+        void ISystem.Update(Simulator simulator, double deltaTime)
         {
-        }
-
-        readonly void ISystem.Update(in SystemContext context, in World world, in TimeSpan delta)
-        {
-            float deltaSeconds = (float)delta.TotalSeconds;
+            World world = simulator.world;
             int capacity = (world.MaxEntityValue + 1).GetNextPowerOf2();
             ref Array<ParticleEmitterState> states = ref statesPerWorld.TryGetValue(world, out bool contains);
             if (!contains)
@@ -64,23 +60,20 @@ namespace Particles.Systems
                             state = new(entity.value);
                         }
 
-                        Update(entity, emitter, particles, arrayType, deltaSeconds, ref state);
+                        Update(emitter, particles, (float)deltaTime, ref state);
                     }
                 }
             }
         }
 
-        readonly void ISystem.Finish(in SystemContext context, in World world)
-        {
-        }
-
-        private static void Update(ParticleEmitter entity, IsParticleEmitter emitter, Values<Particle> particles, int arrayType, float delta, ref ParticleEmitterState state)
+        private static void Update(IsParticleEmitter emitter, Values<Particle> particles, float deltaTime, ref ParticleEmitterState state)
         {
             //advance current particles
-            for (int i = 0; i < particles.Length; i++)
+            Span<Particle> particlesSpan = particles.AsSpan();
+            for (int i = 0; i < particlesSpan.Length; i++)
             {
-                ref Particle particle = ref particles[i];
-                particle.lifetime -= delta;
+                ref Particle particle = ref particlesSpan[i];
+                particle.lifetime -= deltaTime;
                 if (particle.lifetime <= 0)
                 {
                     particle.free = true;
@@ -106,9 +99,9 @@ namespace Particles.Systems
             if (particlesToSpawn > 0)
             {
                 //reuse free particles
-                for (int f = 0; f < particles.Length; f++)
+                for (int f = 0; f < particlesSpan.Length; f++)
                 {
-                    ref Particle particle = ref particles[f];
+                    ref Particle particle = ref particlesSpan[f];
                     if (particle.free)
                     {
                         Spawn(ref particle, emitter, ref state);
@@ -122,17 +115,18 @@ namespace Particles.Systems
 
                 if (particlesToSpawn > 0)
                 {
-                    int previousLength = particles.Length;
+                    int previousLength = particlesSpan.Length;
                     particles.Resize(previousLength + particlesToSpawn);
-                    int newLength = particles.Length;
+                    particlesSpan = particles.AsSpan();
+                    int newLength = particlesSpan.Length;
                     for (int p = previousLength; p < newLength; p++)
                     {
-                        Spawn(ref particles[p], emitter, ref state);
+                        Spawn(ref particlesSpan[p], emitter, ref state);
                     }
                 }
             }
 
-            state.spawnCooldown -= delta;
+            state.spawnCooldown -= deltaTime;
             state.Randomize();
         }
 

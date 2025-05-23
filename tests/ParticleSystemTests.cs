@@ -12,6 +12,18 @@ namespace Particles.Systems.Tests
             MetadataRegistry.Load<ParticlesSystemsMetadataBank>();
         }
 
+        protected override void SetUp()
+        {
+            base.SetUp();
+            simulator.Add(new ParticleSystem());
+        }
+
+        protected override void TearDown()
+        {
+            simulator.Remove<ParticleSystem>();
+            base.TearDown();
+        }
+
         protected override Schema CreateSchema()
         {
             Schema schema = base.CreateSchema();
