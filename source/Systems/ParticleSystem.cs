@@ -1,5 +1,6 @@
 ﻿using Collections.Generic;
 using Particles.Components;
+using Particles.Messages;
 using Simulation;
 using System;
 using Unmanaged;
@@ -7,42 +8,36 @@ using Worlds;
 
 namespace Particles.Systems
 {
-    public class ParticleSystem : ISystem, IDisposable
+    public partial class ParticleSystem : SystemBase, IListener<ParticleUpdate>
     {
-        private readonly Dictionary<World, Array<ParticleEmitterState>> statesPerWorld;
+        private readonly World world;
+        private readonly Array<ParticleEmitterState> states;
+        private readonly int emitterType;
+        private readonly int particleArrayType;
 
-        public ParticleSystem()
+        public ParticleSystem(Simulator simulator, World world) : base(simulator)
         {
-            statesPerWorld = new(4);
+            this.world = world;
+            states = new(4);
+
+            Schema schema = world.Schema;
+            emitterType = schema.GetComponentType<IsParticleEmitter>();
+            particleArrayType = schema.GetArrayType<Particle>();
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
-            foreach (Array<ParticleEmitterState> states in statesPerWorld.Values)
-            {
-                states.Dispose();
-            }
-
-            statesPerWorld.Dispose();
+            states.Dispose();
         }
 
-        void ISystem.Update(Simulator simulator, double deltaTime)
+        void IListener<ParticleUpdate>.Receive(ref ParticleUpdate message)
         {
-            World world = simulator.world;
             int capacity = (world.MaxEntityValue + 1).GetNextPowerOf2();
-            ref Array<ParticleEmitterState> states = ref statesPerWorld.TryGetValue(world, out bool contains);
-            if (!contains)
-            {
-                states = ref statesPerWorld.Add(world);
-                states = new(capacity);
-            }
-            else if (states.Length < capacity)
+            if (states.Length < capacity)
             {
                 states.Length = capacity;
             }
 
-            int emitterType = world.Schema.GetComponentType<IsParticleEmitter>();
-            int arrayType = world.Schema.GetArrayType<Particle>();
             foreach (Chunk chunk in world.Chunks)
             {
                 if (chunk.Definition.ContainsComponent(emitterType))
@@ -53,14 +48,14 @@ namespace Particles.Systems
                     {
                         ParticleEmitter entity = new Entity(world, entities[i]).As<ParticleEmitter>();
                         IsParticleEmitter emitter = components[i];
-                        Values<Particle> particles = world.GetArray<Particle>(entities[i], arrayType);
+                        Values<Particle> particles = world.GetArray<Particle>(entities[i], particleArrayType);
                         ref ParticleEmitterState state = ref states[i];
                         if (state.Entity != entity.value)
                         {
                             state = new(entity.value);
                         }
 
-                        Update(emitter, particles, (float)deltaTime, ref state);
+                        Update(emitter, particles, message.deltaTime, ref state);
                     }
                 }
             }
@@ -82,18 +77,11 @@ namespace Particles.Systems
 
             //create new particles
             int particlesToSpawn = 0;
-            while (true)
+            while (state.spawnCooldown <= 0)
             {
-                if (state.spawnCooldown <= 0)
-                {
-                    state.spawnCooldown += emitter.emission.interval.Evaluate(state.GetRandomFloat());
-                    state.Randomize();
-                    particlesToSpawn++;
-                }
-                else
-                {
-                    break;
-                }
+                state.spawnCooldown += emitter.emission.interval.Evaluate(state.GetRandomFloat());
+                state.Randomize();
+                particlesToSpawn++;
             }
 
             if (particlesToSpawn > 0)

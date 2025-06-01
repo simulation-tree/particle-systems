@@ -1,4 +1,5 @@
-﻿using Simulation.Tests;
+﻿using Particles.Messages;
+using Simulation.Tests;
 using Types;
 using Worlds;
 
@@ -6,6 +7,8 @@ namespace Particles.Systems.Tests
 {
     public abstract class ParticleSystemTests : SimulationTests
     {
+        public World world;
+
         static ParticleSystemTests()
         {
             MetadataRegistry.Load<ParticlesMetadataBank>();
@@ -15,21 +18,23 @@ namespace Particles.Systems.Tests
         protected override void SetUp()
         {
             base.SetUp();
-            Simulator.Add(new ParticleSystem());
+            Schema schema = new();
+            schema.Load<ParticlesSchemaBank>();
+            schema.Load<ParticlesSystemsSchemaBank>();
+            world = new(schema);
+            Simulator.Add(new ParticleSystem(Simulator, world));
         }
 
         protected override void TearDown()
         {
             Simulator.Remove<ParticleSystem>();
+            world.Dispose();
             base.TearDown();
         }
 
-        protected override Schema CreateSchema()
+        protected override void Update(double deltaTime)
         {
-            Schema schema = base.CreateSchema();
-            schema.Load<ParticlesSchemaBank>();
-            schema.Load<ParticlesSystemsSchemaBank>();
-            return schema;
+            Simulator.Broadcast(new ParticleUpdate((float)deltaTime));
         }
     }
 }
