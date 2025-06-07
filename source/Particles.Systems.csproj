@@ -37,9 +37,9 @@
 
   <ItemGroup>
     <Content Include="bin/Debug/net9.0/Particles.Systems.dll" Pack="true" PackagePath="tools/debug/Particles.Systems.dll" Visible="false"/>
-    <Content Include="bin/Debug/net9.0/Particles.Systems.xml" Pack="true" PackagePath="tools/debug/Particles.Systems.xml" Visible="false"/>
+    <Content Include="bin/Debug/net9.0/Particles.Systems.xml" Pack="true" PackagePath="tools/debug/Particles.Systems.xml" Visible="false" Condition="Exists('bin/Debug/net9.0/Particles.Systems.xml')"/>
     <Content Include="bin/Release/net9.0/Particles.Systems.dll" Pack="true" PackagePath="tools/release/Particles.Systems.dll" Visible="false"/>
-    <Content Include="bin/Release/net9.0/Particles.Systems.xml" Pack="true" PackagePath="tools/release/Particles.Systems.xml" Visible="false"/>
+    <Content Include="bin/Release/net9.0/Particles.Systems.xml" Pack="true" PackagePath="tools/release/Particles.Systems.xml" Visible="false" Condition="Exists('bin/Release/net9.0/Particles.Systems.xml')"/>
     <Content Include="build/Particles.Systems.targets" Pack="true" PackagePath="build/Particles.Systems.targets" Visible="false"/>
   </ItemGroup>
 
