@@ -28,19 +28,19 @@ jobs:
         with:
           path: ${{ github.event.repository.name }}
             
-      - name: Checkout `simulation`
-        uses: actions/checkout@v4.1.2
-        with:
-          repository: simulation-tree/simulation
-          token: ${{ secrets.PAT }}
-          path: simulation
-      
       - name: Checkout `particles`
         uses: actions/checkout@v4.1.2
         with:
           repository: simulation-tree/particles
           token: ${{ secrets.PAT }}
           path: particles
+      
+      - name: Checkout `simulation`
+        uses: actions/checkout@v4.1.2
+        with:
+          repository: simulation-tree/simulation
+          token: ${{ secrets.PAT }}
+          path: simulation
       
       - name: Checkout `unmanaged`
         uses: actions/checkout@v4.1.2
@@ -56,13 +56,6 @@ jobs:
           token: ${{ secrets.PAT }}
           path: worlds
       
-      - name: Checkout `shapes`
-        uses: actions/checkout@v4.1.2
-        with:
-          repository: simulation-tree/shapes
-          token: ${{ secrets.PAT }}
-          path: shapes
-      
       - name: Checkout `types`
         uses: actions/checkout@v4.1.2
         with:
@@ -76,11 +69,18 @@ jobs:
           repository: simulation-tree/collections
           token: ${{ secrets.PAT }}
           path: collections
+      
+      - name: Checkout `shapes`
+        uses: actions/checkout@v4.1.2
+        with:
+          repository: simulation-tree/shapes
+          token: ${{ secrets.PAT }}
+          path: shapes
             
       - name: Setup
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: 9.0.x
             
       - name: Test
         run: dotnet test "${{ github.event.repository.name }}/tests" -c Debug --logger "trx"
