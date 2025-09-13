@@ -38,9 +38,11 @@ namespace Particles.Systems
                 states.Length = capacity;
             }
 
-            foreach (Chunk chunk in world.Chunks)
+            ReadOnlySpan<Chunk> chunks = world.Chunks;
+            for (int c = 0; c < chunks.Length; c++)
             {
-                if (chunk.Definition.ContainsComponent(emitterType))
+                Chunk chunk = chunks[c];
+                if (chunk.componentTypes.Contains(emitterType))
                 {
                     ReadOnlySpan<uint> entities = chunk.Entities;
                     ComponentEnumerator<IsParticleEmitter> components = chunk.GetComponents<IsParticleEmitter>(emitterType);
