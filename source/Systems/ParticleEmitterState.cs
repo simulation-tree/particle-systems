@@ -22,10 +22,7 @@ namespace Particles.Systems
         {
             this.entity = entity;
             spawnCooldown = 0;
-            unchecked
-            {
-                random = entity * 0x9E3779B97F4A7C15;
-            }
+            random = entity * 0x9E3779B97F4A7C15;
         }
 
         public void Randomize()
@@ -40,10 +37,7 @@ namespace Particles.Systems
         /// </summary>
         public readonly float GetRandomFloat()
         {
-            unchecked
-            {
-                return (random & 0x7FFFFFFF) * 4.6566128752457969E-10f;
-            }
+            return (random & 0x7FFFFFFF) * 4.6566128752457969E-10f;
         }
 
         /// <summary>
