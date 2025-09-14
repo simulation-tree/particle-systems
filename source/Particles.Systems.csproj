@@ -11,7 +11,7 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <WarningLevel>8</WarningLevel>
     <Authors>popcron</Authors>
-    <Company>simulation-tree</Company>
+    <Company>Simulation Tree</Company>
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
     <Title>Particle Systems</Title>
     <RepositoryUrl>https://github.com/simulation-tree/particle-systems</RepositoryUrl>
