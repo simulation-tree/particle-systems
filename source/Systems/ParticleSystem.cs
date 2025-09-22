@@ -42,7 +42,7 @@ namespace Particles.Systems
             for (int c = 0; c < chunks.Length; c++)
             {
                 Chunk chunk = chunks[c];
-                if (chunk.componentTypes.Contains(emitterType))
+                if (chunk.ComponentTypes.Contains(emitterType))
                 {
                     ReadOnlySpan<uint> entities = chunk.Entities;
                     ComponentEnumerator<IsParticleEmitter> components = chunk.GetComponents<IsParticleEmitter>(emitterType);
